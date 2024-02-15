@@ -1,0 +1,31 @@
+metadata:
+    language: v1-beta
+    name: "V14.4.3 Comprobación de la política de seguridad de contenidos"
+    description: "Comprueba la presencia y configuración de la cabecera de respuesta de la política de seguridad de contenidos (CSP)."
+    author: "Ali Al-Haidary"
+    tags: "Configuration"
+
+given response then
+    # Compruebe que la respuesta no contiene un archivo de imagen, JavaScript o CSS
+    if not({latest.response.headers} matches "Content-Type: image/.*") and not({latest.response.headers} matches 
+           "Content-Type: application/javascript") and not({latest.response.headers} matches "Content-Type: text/css") then
+         
+        # Compruebe si faltan las cabeceras CSP
+        if not ({latest.response.headers} matches "Content-Security-Policy:.*") then
+            report issue:
+                severity: low
+                confidence: certain
+                detail: "Falta la cabecera CSP."
+                remediation: "Introduzca el encabezado de respuesta de la Política de seguridad de contenidos (CSP)."
+        
+        # Überprüfen, ob der CSP-Header unsichere Richtlinien enthält
+        else if ({latest.response.headers} matches "Content-Security-Policy:.+unsafe-inline|unsafe-eval|\*") then
+            report issue:
+                severity: low
+                confidence: certain
+                detail: "La cabecera CSP está mal configurada."
+                remediation: "Eliminar las directivas 'unsafe-inline' y 'unsafe-eval' de la cabecera CSP."
+        end if
+    end if
+
+

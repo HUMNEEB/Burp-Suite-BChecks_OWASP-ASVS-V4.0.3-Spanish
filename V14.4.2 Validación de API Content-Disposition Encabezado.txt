@@ -1,0 +1,39 @@
+metadata:
+    language: v1-beta
+    name: "V14.4.2 Comprobación de la cabecera Content-Disposition de la API"
+    description: "Este BCheck comprueba si todas las respuestas de la API contienen una cabecera Content-Disposition con 'attachment' y un nombre de archivo adecuado.
+                  un nombre de archivo adecuado"
+    author: "Ali Al-Haidary"
+    tags: "Information Disclosure, HTTP Headers"
+
+# Cabeceras que deben comprobarse
+define:
+    contentDisp = "Content-Disposition"
+    contentDispCol = "Content-Disposition:"
+    contentDispVal = `Content-Disposition: attachment; filename="api.json"`
+
+    issueDetailMissing = `Parece que falta la cabecera {contentDisp} en esta respuesta de la API.`
+    issueDetailIncorrect = `Se ha encontrado un valor de cabecera {contentDisp} incorrecto. Se esperaba: '{contentDispVal}'.`
+    issueRemediationMissing = `Asegúrese de que cada respuesta de la API contiene una cabecera {contentDisp} con 'attachment' y un nombre de archivo adecuado para el tipo de contenido. 
+                               nombre de archivo adecuado para el tipo de contenido.`
+    issueRemediationIncorrect = `Comprueba el valor de la cabecera {contentDisp} de la respuesta para asegurarte de que coincide con '{contentDispVal}'. 
+                                 coincide con '{contentDispVal}'.`
+
+given response then
+    if not({latest.response.headers} matches "{contentDispCol}.*") then
+        # Si falta la cabecera Content-Disposition
+        report issue:
+            severity: medium
+            confidence: firm
+            detail: `{issueDetailMissing}`
+            remediation: `{issueRemediationMissing}`
+    else if not ({latest.response.headers} matches "{contentDispVal}") then
+        # Si el valor de la cabecera es incorrecto
+        report issue:
+            severity: medium
+            confidence: firm
+            detail: `{issueDetailIncorrect}`
+            remediation: `{issueRemediationIncorrect}`
+    end if
+
+

@@ -1,0 +1,27 @@
+metadata:
+    language: v1-beta
+    name: "V13.2.1 Comprobación de las restricciones del método RESTful HTTP"
+    description: "Comprueba las respuestas en busca de una exposición potencialmente inapropiada de los métodos HTTP."
+    author: "Ali Al-Haidary"
+    tags: "Information Disclosure, HTTP"
+
+# Controles
+define:
+    allowHeader = "Allow"
+    potentiallyInappropriateMethods = "(DELETE|PUT|PATCH)"
+    allowHeaderCol = "Allow:"
+
+    issueDetailPotentiallyInappropriateMethods = "La respuesta muestra métodos HTTP potencialmente inapropiados para el contexto."
+    issueRemediation = "Compruebe los métodos HTTP permitidos y asegúrese de que son apropiados para el contexto, el usuario o la acción. 
+                        son apropiados."
+
+given response then
+    if ({latest.response.headers} matches "{allowHeaderCol}.*{potentiallyInappropriateMethods}") then
+        # Informe sobre métodos HTTP potencialmente inapropiados.
+        report issue:
+            severity: medium
+            confidence: firm
+            detail: "{issueDetailPotentiallyInappropriateMethods}"
+            remediation: "{issueRemediation}"
+    end if
+

@@ -1,0 +1,20 @@
+metadata:
+  language: v1-beta
+  name: "V3.4.4 Comprobación del prefijo __host para las cookies de sesión"
+  description: "Esta comprobación verifica si los testigos de sesión basados en cookies utilizan el prefijo '__Host-'."
+  author: "Ali Al-Haidary"
+  tags: "Cookies, Session-Management"
+
+given response then
+  # Compruebe la ausencia del prefijo '__Host-' en la cabecera Set-Cookie.
+  if {latest.response} matches "(?i)Set-Cookie: (?!__Host-)[^;]+" then
+    report issue:
+      severity: medium
+      confidence: firm
+      detail: "Se han encontrado cookies de sesión sin el prefijo '__Host-'."
+      remediation: "Asegúrese de que todas las cookies de sesión utilizan el prefijo '__Host-' 
+                    para garantizar un vínculo estricto con el host de origen y aumentar la seguridad. 
+                    y aumentar la seguridad."
+  end if
+
+

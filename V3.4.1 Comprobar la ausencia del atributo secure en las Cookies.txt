@@ -1,0 +1,23 @@
+metadata:
+    language: v1-beta
+    name: "V3.4.1 Comprobar la ausencia del atributo secure en las Cookies"
+    description: "Compruebe las cookies que se establecen sin el atributo 'Secure' en 
+                  respuestas HTTP."
+    author: "Ali Al-Haidary"
+    tags: "Cookies, Session-Management"
+
+given response then
+    # Compruebe si falta el atributo "Seguro".
+    if {latest.response.headers} matches "(?i)Set-Cookie: [^;]+;?(?!.*Secure)" then
+        report issue:
+            severity: medium
+            confidence: firm
+            detail: "Se han encontrado cookies sin el atributo 'Secure'. Esto puede 
+                     exponer las cookies a la interceptación a través de 
+                     conexiones no cifradas."
+            remediation: "Asegúrese de que el atributo "Secure" (seguro) de todas las 
+                          cookies para evitar 
+                          impedir la transmisión a través de conexiones HTTP no cifradas."
+    end if
+
+

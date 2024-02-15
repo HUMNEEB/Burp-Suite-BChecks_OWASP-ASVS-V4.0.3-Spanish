@@ -1,0 +1,26 @@
+metadata:
+    language: v1-beta
+    name: "V14.4.1 Validación del encabezado Content-Type y Charset"
+    description: "Garantizar que cada respuesta HTTP contenga un encabezado Content-Type con un conjunto de caracteres seguro especificado 
+                  para determinados tipos de contenido."
+    author: "Ali Al-Haidary"
+    tags: "HTTP Response, Content-Type, Charset"
+
+given response then
+    #Wenn der Content-Type Header fehlt
+    if not ({latest.response.headers} matches "(?i)Content-Type: .*") then
+        report issue:
+            severity: medium
+            confidence: firm
+            detail: "Falta la cabecera Content-Type en la respuesta HTTP."
+            remediation: "Asegúrese de que cada respuesta HTTP contiene una cabecera Content-Type."
+    else if ({latest.response.headers} matches "(?i)Content-Type: (text/.*|.*\+xml|application/xml)") 
+             and not ({latest.response.headers} matches "(?i)Content-Type: .*charset=(UTF-8|ISO-8859-1)") then
+        report issue:
+            severity: medium
+            confidence: firm
+            detail: "El encabezado Content-Type no especifica un juego de caracteres seguro."
+            remediation: "Utilice UTF-8 o ISO-8859-1 como conjunto de caracteres para los tipos de contenido text/*, */+xml y application/xml."
+    end if
+
+

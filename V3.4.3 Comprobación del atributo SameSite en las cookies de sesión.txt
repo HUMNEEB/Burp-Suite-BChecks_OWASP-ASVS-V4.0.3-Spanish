@@ -1,0 +1,24 @@
+metadata:
+  language: v1-beta
+  name: "V3.4.3 Comprobación del atributo SameSite en las cookies de sesión"
+  description: "Esta comprobación verifica si el atributo 'SameSite' está configurado para 
+                tokens de sesión basados en cookies para limitar la 
+                limitar la exposición a ataques CSRF."
+  author: "Ali Al-Haidary"
+  tags: "Cookies, CSRF-Schutz"
+
+given response then
+  # Compruebe la ausencia del atributo "SameSite" en la cabecera Set-Cookie
+  if {latest.response} matches "(?i)Set-Cookie: [^;]+;?(?!.*;\\s*SameSite=(Lax|Strict)\\s*(;|$))" then
+    report issue:
+      severity: medium
+      confidence: firm
+      detail: "Se encontraron cookies de sesión sin el atributo 'SameSite' o con un valor 
+                valor inadecuado."
+      remediation: "Asegúrese de que el atributo 'SameSite' está configurado para todas las cookies de sesión. 
+                    está configurado para todas las cookies de sesión y tiene un 
+                    valor apropiado ('Lax' o 'Strict') para proporcionar protección 
+                    proporcionar protección contra ataques CSRF."
+  end if
+
+

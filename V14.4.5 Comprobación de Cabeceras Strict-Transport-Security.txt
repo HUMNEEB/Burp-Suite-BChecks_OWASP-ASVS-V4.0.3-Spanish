@@ -1,0 +1,27 @@
+metadata:   
+    language: v1-beta
+    name: "V14.4.5 Comprobación estricta del encabezado de seguridad del transporte"
+    description: "Comprueba la presencia del encabezado Strict-Transport-Security 
+                    con 'max-age=15724800; includeSubDomains' en la respuesta y si 
+                  max-age' es inferior a 15724800."
+    author: "Ali Al-Haidary"
+    tags: "Configuration, Strict-Transport-Security Header"
+
+# Cabecera verificada
+define:
+    hstsCol = "Strict-Transport-Security:"
+
+    issueDetailLowMaxAge = "El valor max-age de la cabecera Strict-Transport-Security es inferior a {minAge}."
+    issueRemediationLowMaxAge = "Establezca el valor max-age de la cabecera Strict-Transport-Security en al menos {minAge}."
+
+given response then
+    if not ({latest.response.headers} matches "{hstsCol}.*(?i)max-age=(15724[8-9][0-9]{2}|1572[5-9][0-9]
+            {3}|157[3-9][0-9]{4}|15[8-9][0-9]{5}|1[6-9][0-9]{6}|[2-9][0-9]
+            {7}|[1-9][0-9]{8}|[1-9][0-9]{8}).*includeSubDomains.*") then
+        report issue:
+            severity: low
+            confidence: certain
+            detail: "{issueDetailLowMaxAge}"
+            remediation: "{issueRemediationLowMaxAge}"
+    end if
+

@@ -1,16 +1,16 @@
 metadata:
     language: v1-beta
-    name: "V14.3.3 Überprüfung auf freigelegte Versionsinformationen in HTTP-Headern/Antworten"
-    description: "Dieses BCheck sucht nach detaillierten Versionsinformationen in HTTP-Headern oder Antworten."
+    name: "V14.3.3 Comprobación de la información de versión expuesta en las cabeceras/respuestas HTTP"
+    description: "Este BCheck busca información detallada sobre la versión en las cabeceras HTTP o en las respuestas."
     author: "Ali Al-Haidary"
     tags: "Information Disclosure, HTTP Headers"
 
 define:
     versionInfoRegex = "Server:.*?/\d+\.\d+(\.\d+)?|X-Powered-By:.*?/\d+\.\d+(\.\d+)?"
 
-    issueDetail = "Freigelegte detaillierte Versionsinformationen in HTTP-Headern oder Antworten"
-    issueRemediation = "Vermeiden der Offenlegung detaillierter Versionsinformationen der Server-Software in 
-                         HTTP-Headern oder Antworten."
+    issueDetail = "Información detallada de la versión expuesta en cabeceras o respuestas HTTP"
+    issueRemediation = "Evitar la divulgación de información detallada sobre la versión del software del servidor en 
+                         cabeceras o respuestas HTTP."
 
 given response then
     if {latest.response.headers} matches "{versionInfoRegex}" or {latest.response.body} matches "{versionInfoRegex}" then

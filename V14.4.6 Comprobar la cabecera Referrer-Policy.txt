@@ -1,0 +1,38 @@
+metadata:
+    language: v1-beta
+    name: "V14.4.6 Comprobación del encabezado de la política de referencia"
+    description: "Comprueba si existe una cabecera Referrer-Policy adecuada para evitar la divulgación de información sensible 
+                  a través de la cabecera Referer."
+    author: "Ali Al-Haidary"
+    tags: "Configuration, Referrer-Policy Header"
+
+define:
+    referrerPolicy = "Referrer-Policy"
+    referrerPolicyCol = "Referrer-Policy:"
+
+    # Valores adecuados para la cabecera Referrer-Policy
+    suitableValues = "no-referrer, same-origin, strict-origin, strict-origin-when-cross-origin"
+
+    issueDetailMissing = "Falta la cabecera {referrerPolicy} en esta respuesta."
+    issueDetailInappropriate = "El valor de la cabecera {referrerPolicy} no es adecuado para evitar la divulgación de información sensible."
+
+    issueRemediation = "Asegúrese de que cada respuesta contiene una cabecera {referrerPolicy} con uno de los siguientes valores: {suitableValues}."
+
+given response then
+    if not ({latest.response.headers} matches "{referrerPolicyCol}.*") then
+        # Si falta la cabecera Referrer-Policy
+        report issue:
+            severity: medium
+            confidence: firm
+            detail: "{issueDetailMissing}"
+            remediation: "{issueRemediation}"
+    else if not ({latest.response.headers} matches "{referrerPolicyCol} ({suitableValues})") then
+        # Si el valor de la cabecera Referrer-Policy es inadecuado
+        report issue:
+            severity: medium
+            confidence: firm
+            detail: "{issueDetailInappropriate}"
+            remediation: "{issueRemediation}"
+    end if
+
+

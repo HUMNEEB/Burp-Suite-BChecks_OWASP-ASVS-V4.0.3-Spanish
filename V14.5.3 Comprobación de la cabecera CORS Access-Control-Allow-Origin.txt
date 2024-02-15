@@ -1,0 +1,42 @@
+metadata:
+    language: v1-beta
+    name: "v14.5.3 Comprobación de la cabecera CORS Access-Control-Allow-Origin"
+    description: "Comprueba la configuración de la cabecera CORS Access-Control-Allow-Origin, 
+                  para asegurarse de que se utiliza una lista estricta de dominios y subdominios de confianza permitidos y de que el valor 
+                  dominios y subdominios y que no se admite el valor "null"."
+    author: "Ali Al-Haidary"
+    tags: "Configuration, CORS-Header"
+
+define:
+    null_origin = "null"
+    subdomain_origin = `{random_str(5)}`
+
+given request then
+ # Comprobar si el origen es "nulo"
+    send request called check_null:
+        replacing headers:
+            "Origin": {null_origin}
+    if "Access-Control-Allow-Origin: null" in {check_null.response.headers} and 
+        {check_null.response.headers} matches "Access-Control-Allow-Credentials: true" then
+        report issue:
+            severity: medium
+            confidence: certain
+            detail: "El encabezado de respuesta Access-Control-Allow-Origin refleja el origen "null"."
+            remediation: "Utilizar una lista blanca estricta de dominios de confianza 
+                          y no permitir el origen 'null'."
+    end if
+
+    # Comprobar el origen del subdominio
+    send request called check_subdomain:
+        replacing headers:
+            "Origin": `https://{subdomain_origin}.{base.request.url.host}`
+    if `Access-Control-Allow-Origin: https://{subdomain_origin}.{base.request.url.host}` 
+        in {check_subdomain.response.headers} and {check_subdomain.response.headers} matches 
+        "Access-Control-Allow-Credentials: true" then
+        report issue:
+            severity: medium
+            confidence: certain
+            detail: "El encabezado de respuesta Access-Control-Allow-Origin refleja el origen del subdominio."
+            remediation: "Utilice una lista blanca estricta de dominios de confianza y no admita el origen "null". 
+                           no admita el origen "null"."
+    end if

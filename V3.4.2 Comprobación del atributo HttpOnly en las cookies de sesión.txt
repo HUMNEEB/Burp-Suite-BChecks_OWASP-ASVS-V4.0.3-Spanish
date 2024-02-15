@@ -1,0 +1,21 @@
+metadata:
+  language: v1-beta
+  name: "V3.4.2 Comprobación del atributo HttpOnly en las cookies de sesión"
+  description: "Esta comprobación verifica si el atributo 'HttpOnly' está establecido para los testigos de sesión basados en cookies. 
+                session tokens está establecido."
+  author: "Ali Al-Haidary"
+  tags: "Cookies, Session-Management"
+
+
+given response then
+  # Compruebe la ausencia del atributo "HttpOnly" en la cabecera Set-Cookie
+  if {latest.response} matches "(?i)Set-Cookie: [^;]+;?(?!.*;\\s*HttpOnly\\s*(;|$))" then
+    report issue:
+      severity: medium
+      confidence: firm
+      detail: "Se han encontrado cookies de sesión sin el atributo 'HttpOnly'."
+      remediation: "Asegúrese de que el atributo "HttpOnly" está configurado para todas las cookies de sesión. 
+                    para proteger contra el acceso de scripts del lado del cliente."
+  end if
+
+
